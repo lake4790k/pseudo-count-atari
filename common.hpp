@@ -28,7 +28,6 @@ typedef double weight_t;
 typedef std::vector<bit_t> context_t;
 
 // describe a binary history
-// typedef boost::dynamic_bitset<> history_t;
 typedef Neighbours history_t;
 
 /* given log(x) and log(y), compute log(x+y). uses the following identity:
