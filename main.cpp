@@ -8,15 +8,15 @@
 #include "ctw.hpp"
 
 const uint16_t dim = 10;
-const uint16_t factorNum = dim * dim;
+const uint16_t factorNum = (dim-2) * (dim-1);
+const uint16_t size = dim*dim;
 
 typedef Factor<ContextTree, factorNum> FactoredContextTree;
 
-history_t history;
 
-std::random_device rd;    
+std::random_device rd;
 
-void printScreen(size_t dim, boost::dynamic_bitset<>& screen) {
+void printScreen(boost::dynamic_bitset<>& screen) {
     size_t i = 0;
     for (size_t r = 0; r < dim; r++) {
         for (size_t c = 0; c < dim; c++) {
@@ -24,17 +24,18 @@ void printScreen(size_t dim, boost::dynamic_bitset<>& screen) {
         }
         printf("\n");
     }
+    printf("\n");
 }
 
-void randomScreen(size_t dim, boost::dynamic_bitset<>& screen) {
+void randomScreen(boost::dynamic_bitset<>& screen) {
     std::mt19937 random(rd());
     std::uniform_int_distribution<uint8_t> uniform(0, 1);
-    for (size_t i=0; i < factorNum; i++) {
+    for (size_t i=0; i < dim*dim; i++) {
         screen[i] = uniform(random);
     }    
 }
 
-void drawScreen(size_t dim, boost::dynamic_bitset<>& screen) {
+void drawScreen(boost::dynamic_bitset<>& screen) {
     for (size_t r = 4; r < 7; r++) {
         for (size_t c = 4; c < 7; c++) {
             size_t i = r*dim + c;
@@ -43,31 +44,58 @@ void drawScreen(size_t dim, boost::dynamic_bitset<>& screen) {
     }
 }
 
+void drawScreen2(boost::dynamic_bitset<>& screen) {
+    for (size_t r = 4; r < 8; r++) {
+        for (size_t c = 4; c < 8; c++) {
+            size_t i = r*dim + c;
+            screen[i] = 1;
+        }
+    }
+}
+
+bit_t at(size_t r, size_t c, size_t dim, boost::dynamic_bitset<>& screen) {
+    size_t i = r*dim+c;
+    return screen[i];
+}
 
 int main(int argc, char *argv[]) {
-    int times = std::stoi(argv[1]);
+    uint32_t times = argc>1 ? std::stoi(argv[1]) : 1;
 
-    for (size_t i=0; i < 4; ++i) history.push_back(0);
+    boost::dynamic_bitset<> screen(dim*dim);
+    boost::dynamic_bitset<> screen2(dim*dim);
+    drawScreen(screen);
+    drawScreen2(screen2);
+    printScreen(screen);
+    printScreen(screen2);
 
-    boost::dynamic_bitset<> screen(factorNum);
-    drawScreen(dim, screen);
-    printScreen(dim, screen);
+    history_t history(screen, dim);
 
-    FactoredContextTree c(history, 4);
+    FactoredContextTree tree(history, 4);
+
+    int reportEvery = 1 + times / 50;
 
     for (size_t z=0; z < times; z++) {
-
-        for (size_t i=0; i<factorNum; i++) {
-            c.update(screen[i]);
+        boost::dynamic_bitset<>& screen1 = z % 2 == 0 ? screen : screen2;
+        history.reset();
+        for (size_t r = 1; r < dim; r++) {
+            for (size_t c = 1; c < dim-1; c++) {
+                tree.update(screen1[r*dim+c]);
+            }
         }
 
         double sumProb = 1.;
 
-        for (size_t i=0; i<factorNum; i++) {
-            double prob = c.prob(screen[i]);
-
-            sumProb *= prob;
+        history.reset();
+        for (size_t r = 1; r < dim; r++) {
+            for (size_t c = 1; c < dim-1; c++) {
+                double prob = tree.prob(screen1[r*dim+c]);
+                history.push_back(0);
+                sumProb *= prob;
+            }
         }
-        printf("P=%f\n", sumProb);
+        if (z % reportEvery==0)
+        printf("P=%.20f\n", sumProb);
     }
+
 }
+

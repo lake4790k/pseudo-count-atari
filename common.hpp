@@ -13,6 +13,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/dynamic_bitset.hpp>
 
+#include "Neighbours.hpp"
 
 // define a bit type
 typedef uint8_t bit_t;
@@ -27,9 +28,8 @@ typedef double weight_t;
 typedef std::vector<bit_t> context_t;
 
 // describe a binary history
-typedef boost::dynamic_bitset<> history_t;
-extern void zeroFill(history_t &h, size_t n);
-
+// typedef boost::dynamic_bitset<> history_t;
+typedef Neighbours history_t;
 
 /* given log(x) and log(y), compute log(x+y). uses the following identity:
    log(x + y) = log(x) + log(1 + y/x) = log(x) + log(1+exp(log(y)-log(x)))*/
