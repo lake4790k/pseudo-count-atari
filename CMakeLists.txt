@@ -17,7 +17,7 @@ FIND_PACKAGE(Boost 1.55.0 REQUIRED COMPONENTS system)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
-FILE(GLOB cppfiles *.cpp *.hpp *.h)
+FILE(GLOB cppfiles src/*.cpp src/*.hpp src/*.h)
 ADD_LIBRARY(pseudocount SHARED ${cppfiles})
 
 TARGET_LINK_LIBRARIES(pseudocount ${Boost_LIBRARIES}) 

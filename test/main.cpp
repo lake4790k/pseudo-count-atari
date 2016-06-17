@@ -3,10 +3,10 @@
 #include <cstdio>
 #include <boost/dynamic_bitset.hpp>
 
-#include "../factor.hpp"
-#include "../common.hpp"
-#include "../ctw.hpp"
-#include "../cts.hpp"
+#include "../src/factor.hpp"
+#include "../src/common.hpp"
+#include "../src/ctw.hpp"
+#include "../src/cts.hpp"
 
 const uint16_t dim = 4;
 const uint16_t SIZE = dim*dim;
