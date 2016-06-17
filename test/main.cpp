@@ -45,9 +45,7 @@ void randomScreen(std::mt19937& random, uint8_t* screen) {
 }
 
 
-int main(int argc, char *argv[]) {
-    uint32_t times = argc>1 ? std::stoi(argv[1]) : 1;
-
+void test(uint32_t times) {
     std::mt19937 random(rd());
     std::uniform_int_distribution<uint16_t> uniformN(0, SIZE-1);
 
@@ -100,6 +98,10 @@ int main(int argc, char *argv[]) {
         if (z % reportEvery==0)
         printf("n=%5lu P=%.20f\n", z, sumProb);
     }
+}
 
+int main(int argc, char *argv[]) {
+    uint32_t times = argc>1 ? std::stoi(argv[1]) : 1;
+    test(times);
 }
 
