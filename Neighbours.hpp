@@ -8,11 +8,10 @@
 class Neighbours {
 public:
 
-    Neighbours(uint8_t* screen, uint16_t dim):
-        screen(screen),
-        dim(dim) {}
+    Neighbours(uint16_t dim): dim(dim) {}
 
-    void reset() {
+    void reset(uint8_t* screen) {
+        this->screen = screen;
         size_=4; 
         mask = 1; 
         col = 1;
@@ -21,7 +20,7 @@ public:
 
     size_t size() const { return size_; };
 
-    void push_back(bool bit) {
+    void push_back(uint8_t) {
         size_++;
         mask <<= 1;
         if (mask==0){
@@ -70,8 +69,8 @@ private:
     uint8_t mask;
     uint16_t col;
     uint16_t row;
+    uint8_t* screen;
 
-    const uint8_t* screen;
     const uint16_t dim;
     size_t size_{4};
 };

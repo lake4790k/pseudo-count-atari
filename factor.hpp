@@ -38,6 +38,8 @@ class Factor : public Compressor {
         /// number of nodes in the context tree
         size_t size() const;
 
+        history_t& getHistory() { return m_history; };
+
     private:
 
         /// copy contructor / assignment operator disabled

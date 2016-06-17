@@ -1,6 +1,7 @@
+#include "factor.hpp"
 
-void init();
+void* init();
 
-double probability(uint8_t* screen);
+double probability(void*, uint8_t*);
 
-
+void finish(void*);
