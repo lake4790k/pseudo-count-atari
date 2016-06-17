@@ -6,12 +6,14 @@
 #include "factor.hpp"
 #include "common.hpp"
 #include "ctw.hpp"
+#include "cts.hpp"
 
 const uint16_t dim = 10;
 const uint16_t factorNum = (dim-2) * (dim-1);
 const uint16_t size = dim*dim;
 
 typedef Factor<ContextTree, factorNum> FactoredContextTree;
+typedef Factor<SwitchingTree, factorNum> FactoredSwitchingTree;
 
 
 std::random_device rd;
@@ -70,12 +72,13 @@ int main(int argc, char *argv[]) {
 
     history_t history(screen, dim);
 
-    FactoredContextTree tree(history, 4);
+//    FactoredContextTree tree(history, 4);
+    FactoredSwitchingTree tree(history, 4);
 
     int reportEvery = 1 + times / 50;
 
     for (size_t z=0; z < times; z++) {
-        boost::dynamic_bitset<>& screen1 = z % 2 == 0 ? screen : screen2;
+        boost::dynamic_bitset<>& screen1 = z % 100000 == 0 ? screen : screen;
         history.reset();
         for (size_t r = 1; r < dim; r++) {
             for (size_t c = 1; c < dim-1; c++) {
@@ -84,7 +87,7 @@ int main(int argc, char *argv[]) {
         }
 
         double sumProb = 1.;
-
+//printf("done\n");
         history.reset();
         for (size_t r = 1; r < dim; r++) {
             for (size_t c = 1; c < dim-1; c++) {

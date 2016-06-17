@@ -58,6 +58,7 @@ Factor<T,N>::Factor(history_t &history, size_t depth) :
 {
     for (size_t i=0; i < N; i++) {
         //m_models[i] = new T(history, depth+i, static_cast<int>(i));
+        //m_models[i] = new T(history, depth+i);
         m_models[i] = new T(history, depth);
     }
 }

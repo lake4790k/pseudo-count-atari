@@ -14,7 +14,7 @@ public:
         screen(screen),
         dim(dim) {}
 
-    void reset() { row = 1; col = 1; };
+    void reset() { row = 1; col = 1; size_=4; };
 
     size_t size() const { return size_; };
 
