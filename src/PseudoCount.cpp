@@ -5,21 +5,36 @@
 #include "ctw.hpp"
 #include "cts.hpp"
 
-typedef Factor<ContextTree> FactoredContextTree;
+//typedef Factor<ContextTree> FactoredContextTree;
 typedef Factor<SwitchingTree> FactoredSwitchingTree;
 
+class PseudoCount {
+public:
+    PseudoCount(uint16_t dim):
+        history(new history_t(dim)),
+        tree(new FactoredSwitchingTree(dim, *history, 4)) {}
 
-extern "C" {
-
-    void* init(uint16_t dim) {
-        history_t* history = new history_t(dim);
-        return new FactoredSwitchingTree(dim, *history, 4);
+    ~PseudoCount() {
+        delete tree;
+        delete history;
     }
 
-    double computeProbability(FactoredSwitchingTree* tree, uint8_t* screen) {
+    double pseudoCount(uint8_t* screen) {
+        double probability = computeProbability(screen);
+        record(screen);
+        double probability_ = computeProbability(screen);
+
+        double count = probability / (probability_ - probability);
+
+        return count;
+    }
+
+private:
+
+    double computeProbability(uint8_t* screen) {
         double probability = 1.;
-        history_t& history = tree->getHistory();
-        history.reset(screen);
+
+        history->reset(screen);
         uint16_t dim = tree->getDim();
 
         for (size_t r = 1; r < dim; r++) {
@@ -30,7 +45,7 @@ extern "C" {
                     bit_t bit = (mask & pixel) > 0;
                     double prob = tree->prob(bit);
                     mask <<= 1;
-                    history.push_back(0);
+                    history->push_back(0);
                     probability *= prob;
                 }
             }
@@ -38,9 +53,8 @@ extern "C" {
         return probability;
     }
 
-    void record(FactoredSwitchingTree* tree, uint8_t* screen) {
-        history_t& history = tree->getHistory();
-        history.reset(screen);
+    void record(uint8_t* screen) {
+        history->reset(screen);
         uint16_t dim = tree->getDim();
 
         for (size_t r = 1; r < dim; r++) {
@@ -56,18 +70,22 @@ extern "C" {
         }
     }
 
-    double pseudoCount(FactoredSwitchingTree* tree, uint8_t* screen) {
-        double probability = computeProbability(tree, screen);
-        record(tree, screen);
-        double probability_ = computeProbability(tree, screen);
+    history_t* history;
+    FactoredSwitchingTree* tree;
+};
 
-        double count = probability / (probability_ - probability);
 
-        return count;
+extern "C" {
+
+    void* init(uint16_t dim) {
+        return new PseudoCount(dim);
     }
 
-    void finish(void* tree_) {
-        FactoredSwitchingTree* tree = static_cast<FactoredSwitchingTree*>(tree_);
-        delete tree;
+    double pseudoCount(PseudoCount* count, uint8_t* screen) {
+        return count->pseudoCount(screen);
+    }
+
+    void finish(PseudoCount* count) {
+        delete count;
     }
 }
