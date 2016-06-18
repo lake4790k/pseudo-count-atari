@@ -11,6 +11,7 @@ typedef Factor<SwitchingTree> FactoredSwitchingTree;
 class PseudoCount {
 public:
     PseudoCount(uint16_t dim):
+        dim(dim),
         history(new history_t(dim)),
         tree(new FactoredSwitchingTree(dim, *history, 4)) {}
 
@@ -35,7 +36,6 @@ private:
         double probability = 1.;
 
         history->reset(screen);
-        uint16_t dim = tree->getDim();
 
         for (size_t r = 1; r < dim; r++) {
             for (size_t c = 1; c < dim-1; c++) {
@@ -55,7 +55,6 @@ private:
 
     void record(uint8_t* screen) {
         history->reset(screen);
-        uint16_t dim = tree->getDim();
 
         for (size_t r = 1; r < dim; r++) {
             for (size_t c = 1; c < dim-1; c++) {
@@ -70,6 +69,7 @@ private:
         }
     }
 
+    const uint16_t dim;
     history_t* history;
     FactoredSwitchingTree* tree;
 };
