@@ -1,6 +1,6 @@
 
 void* init(uint16_t);
 
-double pseudoCount(void*, void*);
+double pseudoCount(FactoredSwitchingTree*, uint8_t*);
 
 void finish(void*);

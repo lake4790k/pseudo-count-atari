@@ -16,10 +16,12 @@ extern "C" {
         return new FactoredSwitchingTree(dim, *history, 4);
     }
 
-    double computeProbability(FactoredSwitchingTree* tree, uint8_t* screen, history_t& history) {
+    double computeProbability(FactoredSwitchingTree* tree, uint8_t* screen) {
         double probability = 1.;
+        history_t& history = tree->getHistory();
         history.reset(screen);
         uint16_t dim = tree->getDim();
+
         for (size_t r = 1; r < dim; r++) {
             for (size_t c = 1; c < dim-1; c++) {
                 uint8_t pixel = screen[r*dim+c];
@@ -36,9 +38,11 @@ extern "C" {
         return probability;
     }
 
-    void record(FactoredSwitchingTree* tree, uint8_t* screen, history_t& history) {
+    void record(FactoredSwitchingTree* tree, uint8_t* screen) {
+        history_t& history = tree->getHistory();
         history.reset(screen);
         uint16_t dim = tree->getDim();
+
         for (size_t r = 1; r < dim; r++) {
             for (size_t c = 1; c < dim-1; c++) {
                 uint8_t pixel = screen[r*dim+c];
@@ -52,14 +56,10 @@ extern "C" {
         }
     }
 
-    double pseudoCount(void* tree_, void* screen_) {
-        FactoredSwitchingTree* tree = static_cast<FactoredSwitchingTree*>(tree_);
-        history_t& history = tree->getHistory();
-        uint8_t* screen = static_cast<uint8_t*>(screen_);
-
-        double probability = computeProbability(tree, screen, history);
-        record(tree, screen, history);
-        double probability_ = computeProbability(tree, screen, history);
+    double pseudoCount(FactoredSwitchingTree* tree, uint8_t* screen) {
+        double probability = computeProbability(tree, screen);
+        record(tree, screen);
+        double probability_ = computeProbability(tree, screen);
 
         double count = probability / (probability_ - probability);
 

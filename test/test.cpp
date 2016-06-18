@@ -11,7 +11,6 @@
 
 const uint16_t dim = 5;
 const uint16_t SIZE = dim*dim;
-const uint16_t factorNum = 8 * (dim-2) * (dim-1);
 
 typedef Factor<ContextTree> FactoredContextTree;
 typedef Factor<SwitchingTree> FactoredSwitchingTree;
@@ -57,7 +56,7 @@ double test(uint32_t times) {
     history_t history(dim);
 
 //    FactoredContextTree tree(dim, history, 4);
-    FactoredSwitchingTree tree(factorNum, history, 4);
+    FactoredSwitchingTree tree(dim, history, 4);
 
     int reportEvery = 1 + times / 50;
 
