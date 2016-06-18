@@ -81,6 +81,8 @@ Factor<T>::~Factor() {
     for (size_t i=0; i < N; i++) {
         delete m_models[i];
     }
+
+    delete[] m_models;
 }
 
 
