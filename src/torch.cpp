@@ -5,22 +5,22 @@
 #include "ctw.hpp"
 #include "cts.hpp"
 
-const uint16_t dim = 10;
-const uint16_t factorNum = 8 * (dim-2) * (dim-1);
+//typedef Factor<ContextTree> FactoredContextTree;
+typedef Factor<SwitchingTree> FactoredSwitchingTree;
 
-//typedef Factor<ContextTree, factorNum> FactoredContextTree;
-typedef Factor<SwitchingTree, factorNum> FactoredSwitchingTree;
-
-history_t history(dim);
 
 extern "C" {
 
-    void* init() {
-        return new FactoredSwitchingTree(history, 4);
+    void* init(uint16_t dim) {
+        history_t* history = new history_t(dim);
+        return new FactoredSwitchingTree(dim, *history, 4);
     }
 
-    double probablity(void* tree_, uint8_t* screen) {
+    double probability(void* tree_, void* screen_) {
         FactoredSwitchingTree* tree = static_cast<FactoredSwitchingTree*>(tree_);
+        uint16_t dim = tree->getDim();
+        history_t& history = tree->getHistory();
+        uint8_t* screen = static_cast<uint8_t*>(screen_);
         double probability = 1.;
         history.reset(screen);
         for (size_t r = 1; r < dim; r++) {

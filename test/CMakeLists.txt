@@ -14,13 +14,10 @@ IF (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     SET(Boost_USE_STATIC_LIBS ON)
 ENDIF()
 
-FILE(GLOB cppfiles src/*.cpp src/*.hpp src/*.h)
+FILE(GLOB cppfiles ../src/*.cpp ../src/*.hpp ../src/*.h)
 
-ADD_LIBRARY(pseudocount MODULE ${cppfiles})
+ADD_LIBRARY(pseudocount ${cppfiles})
 TARGET_LINK_LIBRARIES(pseudocount ${Boost_LIBRARIES}) 
 
-install(TARGETS pseudocount
-        ARCHIVE DESTINATION ${LUA_CPATH} 
-        LIBRARY DESTINATION ${LUA_CPATH} )
-
-install(FILES init.lua DESTINATION ${LUA_PATH}/pseudocount)
+ADD_EXECUTABLE(count-test test.cpp)
+TARGET_LINK_LIBRARIES(count-test pseudocount) 

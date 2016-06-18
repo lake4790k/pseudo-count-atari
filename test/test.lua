@@ -9,15 +9,16 @@ void finish(void*);
 ]]);
 
 local x = torch.ByteTensor(10,10)
-x[1]=100
-x[2]=200
 
 
 local tree = C.init();
 
-for i=1,10000 do
-local p = C.probability(tree, x:data());
-print(p);
+
+local p
+for i=1,1000 do
+    p = C.probability(tree, x:data());
 end
+
+print(p);
 
 C.finish(tree);

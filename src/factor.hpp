@@ -9,13 +9,13 @@
 #include "common.hpp"
 
 // a generic structure for combining compressors for byte oriented data
-template <typename T, size_t N>
+template <typename T>
 class Factor : public Compressor {
 
     public:
 
         /// create a context tree of specified maximum depth and size
-        Factor(history_t &history, size_t depth);
+        Factor(size_t dim, history_t &history, size_t depth);
 
         /// delete the factored context tree
         ~Factor();
@@ -38,6 +38,9 @@ class Factor : public Compressor {
         /// number of nodes in the context tree
         size_t size() const;
 
+        size_t getN() const { return N; };
+        size_t getDim() const { return dim; };
+
         history_t& getHistory() { return m_history; };
 
     private:
@@ -46,18 +49,23 @@ class Factor : public Compressor {
         Factor(const Factor &rhs);
         const Factor &operator=(const Factor &rhs);
 
-        T *m_models[N];
-        size_t m_depth;
+        T** m_models;
+        const size_t m_depth;
+        const size_t N;
+        const size_t dim;
         history_t &m_history;
 };
 
 
 /* create the factored context tree */
-template <typename T, size_t N>
-Factor<T,N>::Factor(history_t &history, size_t depth) :
+template <typename T>
+Factor<T>::Factor(size_t dim, history_t &history, size_t depth) :
     m_depth(depth),
-    m_history(history)
+    m_history(history),
+    dim(dim),
+    N(8 * (dim-2) * (dim-1))
 {
+    m_models = new T*[N];
     for (size_t i=0; i < N; i++) {
         //m_models[i] = new T(history, depth+i, static_cast<int>(i));
         //m_models[i] = new T(history, depth+i);
@@ -67,8 +75,8 @@ Factor<T,N>::Factor(history_t &history, size_t depth) :
 
 
 /* delete the factored context tree */
-template <typename T, size_t N>
-Factor<T,N>::~Factor() {
+template <typename T>
+Factor<T>::~Factor() {
 
     for (size_t i=0; i < N; i++) {
         delete m_models[i];
@@ -77,8 +85,8 @@ Factor<T,N>::~Factor() {
 
 
 /* the logarithm of the probability of all processed experience */
-template <typename T, size_t N>
-double Factor<T,N>::logBlockProbability() const {
+template <typename T>
+double Factor<T>::logBlockProbability() const {
 
     double sum = 0.0;
     for (size_t i=0; i < N; i++) {
@@ -89,8 +97,8 @@ double Factor<T,N>::logBlockProbability() const {
 
 
 /* the probability of seeing a particular symbol next */
-template <typename T, size_t N>
-double Factor<T,N>::prob(bit_t b) {
+template <typename T>
+double Factor<T>::prob(bit_t b) {
 
     size_t idx = (m_history.size() - m_depth) % N;
     return m_models[idx]->prob(b);
@@ -98,8 +106,8 @@ double Factor<T,N>::prob(bit_t b) {
 
 
 /* process a new piece of data */
-template <typename T, size_t N>
-void Factor<T,N>::update(bit_t b) {
+template <typename T>
+void Factor<T>::update(bit_t b) {
 
     size_t idx = (m_history.size() - m_depth) % N;
     m_models[idx]->update(b);
@@ -107,16 +115,16 @@ void Factor<T,N>::update(bit_t b) {
 
 
 /* the depth of the context tree */
-template <typename T, size_t N>
-size_t Factor<T,N>::depth() const {
+template <typename T>
+size_t Factor<T>::depth() const {
 
     return m_depth;
 }
 
 
 /* number of nodes in the factored context tree */
-template <typename T, size_t N>
-size_t Factor<T,N>::size() const {
+template <typename T>
+size_t Factor<T>::size() const {
 
     size_t sum = 0;
     for (size_t i=0; i < N; i++) {
@@ -127,8 +135,8 @@ size_t Factor<T,N>::size() const {
 
 
 /* file extension */
-template <typename T, size_t N>
-const char *Factor<T, N>::fileExtension() const {
+template <typename T>
+const char *Factor<T>::fileExtension() const {
 
     static const std::string ext = std::string("fac") + m_models[0]->fileExtension();
     return ext.c_str();
