@@ -1,24 +1,23 @@
-local ffi=require 'ffi'
+local PseudoCount = require 'pseudocount';
 
-local C = ffi.load(package.searchpath('libpseudocount', package.cpath))
-
-ffi.cdef([[
-void* init();
-double probability(void*, void*);
-void finish(void*);
-]]);
-
-local x = torch.ByteTensor(10,10)
+local Test = torch.TestSuite()
+local tester = torch.Tester()
 
 
-local tree = C.init();
+function Test:test()
+    local dim = 5
+    local count = PseudoCount(dim)
+    local screen = torch.ByteTensor(dim,dim):fill(0)
 
+    local p
+    for i=1,100 do
+        p = count:probability(screen)
+    end
+--    print(p);
+    tester:assertge(p, 0.85)
 
-local p
-for i=1,1000 do
-    p = C.probability(tree, x:data());
+    count:finish()
 end
 
-print(p);
-
-C.finish(tree);
+tester:add(Test)
+tester:run()
