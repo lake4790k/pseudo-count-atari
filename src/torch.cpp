@@ -5,7 +5,7 @@
 #include "ctw.hpp"
 #include "cts.hpp"
 
-//typedef Factor<ContextTree> FactoredContextTree;
+typedef Factor<ContextTree> FactoredContextTree;
 typedef Factor<SwitchingTree> FactoredSwitchingTree;
 
 
@@ -16,13 +16,10 @@ extern "C" {
         return new FactoredSwitchingTree(dim, *history, 4);
     }
 
-    double probability(void* tree_, void* screen_) {
-        FactoredSwitchingTree* tree = static_cast<FactoredSwitchingTree*>(tree_);
-        uint16_t dim = tree->getDim();
-        history_t& history = tree->getHistory();
-        uint8_t* screen = static_cast<uint8_t*>(screen_);
+    double computeProbability(FactoredSwitchingTree* tree, uint8_t* screen, history_t& history) {
         double probability = 1.;
         history.reset(screen);
+        uint16_t dim = tree->getDim();
         for (size_t r = 1; r < dim; r++) {
             for (size_t c = 1; c < dim-1; c++) {
                 uint8_t pixel = screen[r*dim+c];
@@ -36,8 +33,12 @@ extern "C" {
                 }
             }
         }
+        return probability;
+    }
 
+    void record(FactoredSwitchingTree* tree, uint8_t* screen, history_t& history) {
         history.reset(screen);
+        uint16_t dim = tree->getDim();
         for (size_t r = 1; r < dim; r++) {
             for (size_t c = 1; c < dim-1; c++) {
                 uint8_t pixel = screen[r*dim+c];
@@ -49,8 +50,20 @@ extern "C" {
                 }
             }
         }
+    }
 
-        return probability;
+    double pseudoCount(void* tree_, void* screen_) {
+        FactoredSwitchingTree* tree = static_cast<FactoredSwitchingTree*>(tree_);
+        history_t& history = tree->getHistory();
+        uint8_t* screen = static_cast<uint8_t*>(screen_);
+
+        double probability = computeProbability(tree, screen, history);
+        record(tree, screen, history);
+        double probability_ = computeProbability(tree, screen, history);
+
+        double count = probability / (probability_ - probability);
+
+        return count;
     }
 
     void finish(void* tree_) {

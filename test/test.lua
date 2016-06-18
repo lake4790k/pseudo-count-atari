@@ -3,6 +3,7 @@ local PseudoCount = require 'pseudocount';
 local Test = torch.TestSuite()
 local tester = torch.Tester()
 
+torch.manualSeed(1)
 
 function Test:test()
     local dim = 5
@@ -11,10 +12,10 @@ function Test:test()
 
     local p
     for i=1,100 do
-        p = count:probability(screen)
+        p = count:pseudoCount(screen)
+--        print(p);
     end
---    print(p);
-    tester:assertge(p, 0.85)
+    tester:assertge(p, 2295)
 
     count:finish()
 end

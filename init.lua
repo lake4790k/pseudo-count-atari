@@ -3,7 +3,7 @@ local ffi=require 'ffi'
 
 ffi.cdef([[
 void* init(uint16_t);
-double probability(void*, void*);
+double pseudoCount(void*, void*);
 void finish(void*);
 ]]);
 
@@ -16,8 +16,8 @@ function PseudoCount:_init(dim)
     classic.strict(self)
 end
 
-function PseudoCount:probability(screen)
-    return tonumber(C.probability(self.tree, screen:data()))
+function PseudoCount:pseudoCount(screen)
+    return tonumber(C.pseudoCount(self.tree, screen:data()))
 end
 
 function PseudoCount:finish()
