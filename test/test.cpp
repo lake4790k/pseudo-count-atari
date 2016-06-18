@@ -103,7 +103,7 @@ double test(uint32_t times) {
            printf("n=%5lu P_=%.20f P=%.20f\n", z, sumProb / (8*SIZE), probability);
         }
     }
-    delete screen;
+    delete[] screen;
     return probability;
 }
 
