@@ -28,6 +28,6 @@ before_install:
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER ../test && make
   - valgrind --leak-check=full --error-exitcode=1 ./count-test 1000
   
