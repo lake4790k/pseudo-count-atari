@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "-std=c++14 -O3 -g")
 
 SET(Boost_NO_SYSTEM_PATHS OFF)
 SET(Boost_USE_STATIC_RUNTIME OFF)
-FIND_PACKAGE(Boost 1.55.0 REQUIRED COMPONENTS system)
+FIND_PACKAGE(Boost 1.53.0 REQUIRED COMPONENTS system)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
 # x86_64 Linux cannot use static libs inside of a dynamic lib.
